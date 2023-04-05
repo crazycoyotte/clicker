@@ -3,18 +3,18 @@ import constant as cst
 import pygame
 
 
-def print_main_menu(window):
+def ending_screen(window):
     # Font
-    game_name_font = pygame.font.Font(cst.FONT, 75)
+    game_name_font = pygame.font.Font(cst.FONT, 50)
     button_font = pygame.font.Font(cst.FONT, 24)
 
     # Print on screen
     window.fill(cst.BLACK)
-    game_name = game_name_font.render(f"Clicker Race", True, cst.WHITE)
+    game_name = game_name_font.render(f"Congratulations", True, cst.WHITE)
     window.blit(game_name, (cst.WIDTH / 2 - game_name.get_width() / 2, cst.HEIGHT / 50))
 
     # Start button area
-    start_button = button_font.render("Start", True, cst.WHITE)
+    start_button = button_font.render("Restart", True, cst.WHITE)
     start_button_pos_x = cst.WIDTH / 2 - start_button.get_width() / 2
     start_button_pos_y = cst.HEIGHT / 2
     start_button_rect = start_button.get_rect(topleft=(start_button_pos_x, start_button_pos_y))
@@ -26,7 +26,6 @@ def print_main_menu(window):
     quit_button_pos_y = cst.HEIGHT / 2 + quit_button.get_height() * 2
     quit_button_rect = quit_button.get_rect(topleft=(quit_button_pos_x, quit_button_pos_y))
     window.blit(quit_button, quit_button_rect)
-
 
     # Update window
     pygame.display.update()
