@@ -1,2 +1,0 @@
-pygame 2.3.0
-Python 3.10.10
