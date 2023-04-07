@@ -3,7 +3,7 @@ import constant as cst
 import pygame
 
 
-def ending_screen(window):
+def ending_screen(window, elapsed_time):
     # Font
     game_name_font = pygame.font.Font(cst.FONT, 50)
     button_font = pygame.font.Font(cst.FONT, 24)
@@ -12,6 +12,12 @@ def ending_screen(window):
     window.fill(cst.BLACK)
     game_name = game_name_font.render(f"Congratulations", True, cst.WHITE)
     window.blit(game_name, (cst.WIDTH / 2 - game_name.get_width() / 2, cst.HEIGHT / 50))
+
+    # Print time on screen
+    game_time = button_font.render(f"you reached  1 000 000 000 in", True, cst.WHITE)
+    window.blit(game_time, (cst.WIDTH / 2 - game_time.get_width() / 2, cst.HEIGHT / 7))
+    game_time = button_font.render(str(elapsed_time), True, cst.WHITE)
+    window.blit(game_time, (cst.WIDTH / 2 - game_time.get_width() / 2, cst.HEIGHT / 5))
 
     # Start button area
     start_button = button_font.render("Restart", True, cst.WHITE)

@@ -8,7 +8,13 @@ pygame.init()
 
 # window creation
 window = pygame.display.set_mode((cst.WIDTH, cst.HEIGHT))
-click_area = pygame.Rect((cst.WIDTH / 2, 0, cst.WIDTH / 2, cst.HEIGHT))
+click_area = pygame.Rect((cst.WIDTH / 2, cst.HEIGHT / 3, cst.WIDTH / 2, cst.HEIGHT / 3))
+
+# clock creation
+clock = pygame.time.Clock()
+
+# clock start
+start_ticks = pygame.time.get_ticks()
 
 # font
 txt_font = pygame.font.Font(cst.FONT, 18)
@@ -73,18 +79,17 @@ window.blit(bonus3_cost, (cst.WIDTH / 50, (30 * cst.HEIGHT / 50) + bonus3_button
 # Functions
 # In-game UI
 def draw_on_screen_in_game():
+
     text_surface = txt_font.render(f"Score : {score}", True, cst.WHITE)
-    window.fill(cst.BLACK)
-    window.set_alpha(255)
     pygame.draw.rect(window, cst.RED, click_area)
     window.blit(text_surface, (cst.WIDTH / 50, cst.HEIGHT / 50))
     click_damage = 0
     if bonus2_level == 0:
         click_damage = (damage + bonus1_level)
     if bonus2_level > 0:
-        click_damage += ((damage + bonus1_level) * bonus2_level)
+        click_damage = ((damage + bonus1_level) * (bonus2_level + 1))
     if bonus3_level > 0:
-        click_damage += ((damage + bonus1_level) * bonus2_level) ** bonus3_level
+        click_damage = ((damage + bonus1_level) * (bonus2_level + 1)) * (bonus3_level * 20)
 
     actual_click_damage = descri_font.render(
         f"Actual click value : {click_damage}", True, cst.WHITE)
@@ -101,7 +106,7 @@ def draw_on_screen_in_game():
 
     if bonus2_activated:
         # bonus2
-        bonus2_button = txt_font.render(f"> Multiply by {((damage + bonus1_level) * bonus2_level)} click <", True, cst.WHITE)
+        bonus2_button = txt_font.render(f"> Multiply click by {(bonus2_level + 1)} <", True, cst.WHITE)
         bonus2_description = descri_font.render(f"Actual level : {bonus2_level}", True, cst.WHITE)
         bonus2_cost = descri_font.render(f"next level cost : {((bonus2_level + 1) * 20)}", True, cst.WHITE)
         window.blit(bonus2_button, bonus2_button_rect)
@@ -111,25 +116,35 @@ def draw_on_screen_in_game():
 
     if bonus3_activated:
         # bonus3
-        bonus3_button = txt_font.render(f"> click power by {(damage + bonus1_level) ** bonus3_level} <", True,
-                                        cst.WHITE)
+        if bonus3_level == 0 :
+            bonus3_button = txt_font.render(f"> Multiply click by 1 <", True,
+                                            cst.WHITE)
+        else :
+            bonus3_button = txt_font.render(f"> Multiply click by {bonus3_level * 20} <", True,
+                                            cst.WHITE)
         bonus3_description = descri_font.render(f"Actual level : {bonus3_level}", True, cst.WHITE)
-        bonus3_cost = descri_font.render(f"next level cost : {(damage + bonus1_level) ** (bonus3_level ** 2)}", True, cst.WHITE)
+        bonus3_cost = descri_font.render(f"next level cost : {(bonus3_level + 1) * (bonus3_level * 200)}", True, cst.WHITE)
+        bonus3_next = descri_font.render(f"Next level value : {(bonus3_level + 1) * 20}", True, cst.WHITE)
         window.blit(bonus3_button, bonus3_button_rect)
         window.blit(bonus3_description, (cst.WIDTH / 50, (30 * cst.HEIGHT / 50) + bonus3_button.get_height()))
         window.blit(bonus3_cost, (cst.WIDTH / 50, (30 * cst.HEIGHT / 50) + bonus3_button.get_height()
                                   + bonus3_description.get_height()))
+        window.blit(bonus3_next, (cst.WIDTH / 50, (30 * cst.HEIGHT / 50) + bonus3_button.get_height()
+                                  + bonus3_description.get_height() * 2))
 
     # Update screen
     pygame.display.update()
 
-# Main Menu
+# Main Screen
 running = main_menu.print_main_menu(window)
 main = True
 end = False
 draw_on_screen_in_game()
 while running:
     while main:
+        # Elapsed time
+        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -147,11 +162,10 @@ while running:
                 if bonus2_level == 0:
                     score += (damage + bonus1_level)
                 if bonus2_level > 0:
-                    score += ((damage + bonus1_level) * bonus2_level)
+                    score += ((damage + bonus1_level) * (bonus2_level + 1))
                 if bonus3_level > 0:
-                    score += ((damage + bonus1_level) * bonus2_level) ** bonus3_level
+                    score += ((damage + bonus1_level) * bonus2_level) * (bonus3_level * 20)
 
-            print((1 + bonus3_level / 5))
             # The player click on bonus1 zone
             if event.type == pygame.MOUSEBUTTONDOWN and bonus1_button_rect.collidepoint(mouse_x, mouse_y) and \
                     event.button == 1 and score >= (bonus1_level + 1):
@@ -169,20 +183,30 @@ while running:
 
             # The player click on bonus3 zone
             if event.type == pygame.MOUSEBUTTONDOWN and bonus3_button_rect.collidepoint(mouse_x, mouse_y) and \
-                    event.button == 1 and score >= (damage + bonus1_level) ** (bonus3_level ** 2):
-                score -= (damage + bonus1_level) ** (bonus3_level ** 2)
+                    event.button == 1 and score >= ((bonus3_level + 1) * (bonus3_level * 200)):
+                score -= ((bonus3_level + 1) * (bonus3_level * 200))
                 bonus3_level += 1
 
             text_surface = txt_font.render(f"Score : {score}", True, cst.WHITE)
 
+            window.fill(cst.BLACK)
+            window.set_alpha(255)
+
+            # print elapsed time
+            elapsed_time = txt_font.render(f"Elapsed time : {seconds}", True, cst.WHITE)
+            window.blit(elapsed_time, (cst.WIDTH / 2, cst.HEIGHT / 20))
+
             draw_on_screen_in_game()
 
-            if score > 100000000:
+            # fps limit
+            clock.tick(60)
+
+            if score > 1000000000:
                 main = False
                 end = True
 
     if end:
-        running = ending.ending_screen(window)
+        running = ending.ending_screen(window, seconds)
         if running:
             damage = 1
             score = 0
